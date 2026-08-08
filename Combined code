@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>User Search Cards</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      padding: 40px 20px;
+      background: #000;
+      color: white;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    .heading {
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    .heading h1 {
+      margin-bottom: 8px;
+      font-size: 32px;
+    }
+
+    .heading p {
+      color: #aaa;
+      font-size: 15px;
+    }
+
+    .inp {
+      display: block;
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto 35px;
+      padding: 15px 18px;
+      border: 1px solid #333;
+      border-radius: 8px;
+      outline: none;
+      background: #111;
+      color: white;
+      font-size: 16px;
+    }
+
+    .inp::placeholder {
+      color: #888;
+    }
+
+    .inp:focus {
+      border-color: #777;
+    }
+
+    .cards {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 25px;
+    }
+
+    .card {
+      position: relative;
+      width: 230px;
+      height: 340px;
+      overflow: hidden;
+      border-radius: 28px;
+      background: #111;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .bg-img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .blurred-layer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      background-position: center;
+      background-size: cover;
+      filter: blur(12px);
+
+      mask-image: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 1),
+        rgba(0, 0, 0, 0)
+      );
+
+      -webkit-mask-image: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 1),
+        rgba(0, 0, 0, 0)
+      );
+    }
+
+    .content {
+      position: absolute;
+      right: 18px;
+      bottom: 18px;
+      left: 18px;
+      z-index: 2;
+      color: white;
+    }
+
+    .content h3 {
+      margin-bottom: 7px;
+      font-size: 19px;
+      font-weight: bold;
+    }
+
+    .content p {
+      margin-bottom: 10px;
+      color: #ddd;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .content span {
+      display: block;
+      overflow: hidden;
+      color: #bbb;
+      font-size: 12px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .no-results {
+      width: 100%;
+      margin-top: 30px;
+      color: #aaa;
+      text-align: center;
+      font-size: 18px;
+    }
+
+    @media (max-width: 600px) {
+      .heading h1 {
+        font-size: 26px;
+      }
+
+      .card {
+        width: 280px;
+        height: 380px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="container">
+    <div class="heading">
+      <h1>User Search</h1>
+      <p>Provide a name to search for users</p>
+    </div>
+
+    <input
+      class="inp"
+      type="text"
+      placeholder="Provide a name to search..."
+      autocomplete="off"
+    />
+
+    <div class="cards"></div>
+  </main>
+
+  <script>
+    const users = [
+      {
+        name: "Abhay Chandel",
+        email: "thakurabhaysingh019@gmail.com",
+        bio: "I am a web developer and I love to create beautiful and functional websites.",
+        pic: "https://media.licdn.com/dms/image/v2/D5603AQHmC2HaiEQa-Q/profile-displayphoto-scale_100_100/B56ZtAvcdSLAAc-/0/1766317739440?e=1787788800&v=beta&t=gfuN0zzYakjQn692c02C7uaLiW0GTZmYmCMfzZnfvfc"
+      },
+      {
+        name: "John Snow",
+        email: "john.snow@example.com",
+        bio: "John is a software engineer with a passion for creating innovative solutions.",
+        pic: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=774&auto=format&fit=crop"
+      },
+      {
+        name: "Peter Parker",
+        email: "peter.parker@example.com",
+        bio: "Peter is a web developer with a passion for creating modern websites.",
+        pic: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=774&auto=format&fit=crop"
+      },
+      {
+        name: "Tony Stark",
+        email: "tony.stark@example.com",
+        bio: "Tony is a genius inventor and CEO of Stark Industries.",
+        pic: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=774&auto=format&fit=crop"
+      }
+    ];
+
+    const input = document.querySelector(".inp");
+    const cardsContainer = document.querySelector(".cards");
+
+    function showUsers(usersArray) {
+      cardsContainer.innerHTML = "";
+
+      if (usersArray.length === 0) {
+        cardsContainer.innerHTML = `
+          <p class="no-results">No user found.</p>
+        `;
+        return;
+      }
+
+      usersArray.forEach(function (user) {
+        const card = document.createElement("div");
+        card.classList.add("card");
+
+        const image = document.createElement("img");
+        image.classList.add("bg-img");
+        image.src = user.pic;
+        
+
+        image.onerror = function () {
+          image.src =
+            "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=774&auto=format&fit=crop";
+        };
+
+        const blurredLayer = document.createElement("div");
+        blurredLayer.classList.add("blurred-layer");
+        blurredLayer.style.backgroundImage = `url("${user.pic}")`;
+
+        const content = document.createElement("div");
+        content.classList.add("content");
+
+        const nameHeading = document.createElement("h3");
+        nameHeading.textContent = user.name;
+
+        const bio = document.createElement("p");
+        bio.textContent = user.bio;
+
+        const email = document.createElement("span");
+        email.textContent = `Email: ${user.email}`;
+
+        content.appendChild(nameHeading);
+        content.appendChild(bio);
+        content.appendChild(email);
+
+        card.appendChild(image);
+        card.appendChild(blurredLayer);
+        card.appendChild(content);
+
+        cardsContainer.appendChild(card);
+      });
+    }
+
+    input.addEventListener("input", function () {
+      const searchValue = input.value.toLowerCase().trim();
+
+      const filteredUsers = users.filter(function (user) {
+        return user.name.toLowerCase().includes(searchValue);
+      });
+
+      showUsers(filteredUsers);
+    });
+
+    showUsers(users);
+  </script>
+
+</body>
+</html>
